@@ -1,0 +1,21 @@
+{
+  "name": "backendcocascs",
+  "version": "0.0.1",
+  "description": "Backend to use on cocascs app",
+  "main": "server/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "keywords": [
+    "express",
+    "rest",
+    "server"
+  ],
+  "author": "Edgar Colón <edgar.colonb@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}

@@ -1,5 +1,8 @@
 const express = require('express');
 const app = new express();
+// mongoose import
+const mongoose = require('mongoose');
+
 require('./server/config/config');
 const routesApi = require('./routes/api');
 const routesWeb = require('./routes/web');

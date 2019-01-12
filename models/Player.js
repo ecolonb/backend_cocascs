@@ -20,9 +20,9 @@ const PlayerSchema = new Schema({
   },
   role: {
     type: String,
-    default: 'user',
+    default: 'player',
     enum: {
-      values: ['admin', 'user', 'spect'],
+      values: ['admin', 'player', 'spect'],
       message: '{VALUE} no es un role valido!'
     }
   },
@@ -47,6 +47,16 @@ const PlayerSchema = new Schema({
     default: new Date()
   }
 });
+// Intersertar JSON para borrar password!
+PlayerSchema.methods.toJSON = function() {
+  let obj = this.toObject();
+  delete obj.role;
+  delete obj.confirmed_acount;
+  delete obj.online;
+  delete obj.created_at;
+  return obj;
+};
+
 // plugin to validate unique data => mongoose unique validator
 PlayerSchema.plugin(muv, {
   message: 'El valor: [{VALUE}] para el campo [{PATH}] debe ser único!'

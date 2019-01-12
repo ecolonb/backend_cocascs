@@ -1,0 +1,20 @@
+Routes API:
+
+
+//Check user available [GET]
+    => api/checkuser/:user
+
+//Check email available [GET]
+    => api/checkuser/:email
+
+//New user [POST]
+    => api/newuser
+    InputData:{
+                name: string|required,
+                lastname string|required,, 
+                email: string|required|unique,
+                role: string|required|enum:['admin', 'player', 'spect'],
+                user: string|required|unique,
+                password: string|required,
+            }
+//         

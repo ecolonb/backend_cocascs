@@ -68,7 +68,30 @@ module.exports = {
               res: NewPlayer,
               session: sessionResponse
             };
-            return res.status(200).json(response_data);
+            console.log('Antes de utilizar mailgun===>>>>>>');
+            //Enviar email confirmación.
+            var api_key = '2fc79774891e9697ac90a271e20f9625-060550c6-a3572ca8';
+            var domain = 'sandbox112ee495c6c040e8bb243e77b7138c90.mailgun.org';
+            var mailgun = require('mailgun-js')({
+              apiKey: api_key,
+              domain: domain
+            });
+
+            var data = {
+              from: 'Cocas Copiloto Satelital <ecolon@copiloto.com.mx>',
+              to: 'ecolon@copiloto.com.mx',
+              subject: 'Hello',
+              html: '<b> Test email text </b>'
+            };
+
+            mailgun.messages().send(data, function(error, body) {
+              console.log('In mailgun=>>>>>>>>>>>>>>>>>');
+              if (error) {
+                console.log('Error:', error);
+              }
+              console.log(body);
+              return res.status(200).json(response_data);
+            });
           }
         });
       }

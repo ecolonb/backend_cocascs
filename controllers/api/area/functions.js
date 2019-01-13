@@ -1,4 +1,5 @@
 const Area = require('../../../models/Area');
+const _ = require('underscore');
 module.exports = {
   new_area: (req, res) => {
     const formData = req.body;
@@ -9,7 +10,7 @@ module.exports = {
           err_: true,
           mssg: err
         };
-        return res.status(400).json(err);
+        return res.status(400).json(responseDate);
       } else {
         const responseData = {
           err_: false,
@@ -28,10 +29,14 @@ module.exports = {
         };
         return res.status(400).json(responseData);
       } else {
+        let areasData = [];
+        result.map((resultMap, index) => {
+          areasData.push(_.pick(resultMap, ['name', '_id']));
+        });
         const responseData = {
           err_: false,
           mssg: 'request_ok',
-          data: result
+          data: areasData
         };
         return res.status(200).json(responseData);
       }

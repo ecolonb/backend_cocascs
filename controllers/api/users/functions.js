@@ -1,10 +1,13 @@
 const Player = require('../../../models/Player');
 const Session = require('../../../models/Session');
+const Area = require('../../../models/Area');
 const bcrypt = require('bcrypt');
 const _ = require('underscore');
 module.exports = {
   newUser: async (req, res) => {
     const formData = req.body;
+    console.log('formData: ', formData);
+    console.log('formData type: ', typeof formData);
     // const test = await bcrypt.compareSync(
     //   formData.password,
     //   '$2a$07$5o3Zq8X76N6B0NtrRmptyOhCuMGaflUqTvjYdaATd.aVM83K3fWca'
@@ -20,15 +23,12 @@ module.exports = {
       name: formData.name,
       lastname: formData.lastname,
       role: formData.role,
-      email: formData.email
+      email: formData.email,
+      ref_area: formData.area
     };
-    let sessionData = {
-      user: formData.user,
-      password: formData.password,
-      ref_player: undefined
-    };
+
     const player = new Player(playerData);
-    player.save((err, NewPlayer) => {
+    player.save(async (err, NewPlayer) => {
       if (err) {
         const response_data = {
           err: true,
@@ -36,38 +36,52 @@ module.exports = {
         };
         return res.status(400).json(response_data);
       } else {
+        let sessionData = {
+          user: formData.user,
+          password: formData.password,
+          ref_player: undefined
+        };
+        // Si el participante se creo correctamente se intenta guardar la session
         sessionData.ref_player = NewPlayer;
         const session = new Session(sessionData);
 
-        session.save((err, NewSession) => {
+        session.save(async (err, NewSession) => {
           if (err) {
             // Aqui eliminar el participante insertado
             const response_data = {
               err: true,
               res: err
             };
-            Player.findByIdAndDelete(NewPlayer._id, (err_, playerDeleted) => {
-              if (err_) {
-                const response_data = {
-                  err: false,
-                  res: err_
-                };
-                return res.status(400).json(response_data);
-              } else {
-                const response_data = {
-                  err: false,
-                  res: err
-                };
-                return res.status(200).json(response_data);
+            Player.findByIdAndDelete(
+              NewPlayer._id,
+              async (err_, playerDeleted) => {
+                if (err_) {
+                  const response_data = {
+                    err: false,
+                    res: err_
+                  };
+                  return res.status(400).json(response_data);
+                } else {
+                  const response_data = {
+                    err: false,
+                    res: err
+                  };
+                  return res.status(400).json(response_data);
+                }
               }
-            });
+            );
           } else {
+            // Obteniendo unicamente los datos que se enviaram de respuesta
             const sessionResponse = _.pick(NewSession, ['user', 'created_at']);
             const response_data = {
               err: false,
               res: NewPlayer,
               session: sessionResponse
             };
+            //Agregar uuario a Area
+            const area = await Area.findById(formData.area);
+            area.ref_player.push(NewPlayer);
+            await area.save();
             //Enviar email confirmación.
             var api_key = '2fc79774891e9697ac90a271e20f9625-060550c6-a3572ca8';
             var domain = 'sandbox112ee495c6c040e8bb243e77b7138c90.mailgun.org';
@@ -75,12 +89,17 @@ module.exports = {
               apiKey: api_key,
               domain: domain
             });
-
             var data = {
               from: 'Cocas Copiloto Satelital <ecolon@copiloto.com.mx>',
-              to: 'ecolon@copiloto.com.mx',
-              subject: 'Hello',
-              html: '<b> Test email text </b>'
+              to:
+                formData.name +
+                ' ' +
+                formData.lastname +
+                ' <' +
+                formData.email +
+                '>',
+              subject: 'Activación de cuenta Cocas Cs',
+              html: '<b> Test email validation HTML </b>'
             };
 
             mailgun.messages().send(data, function(error, body) {

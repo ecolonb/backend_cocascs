@@ -1,12 +1,14 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const muv = require('mongoose-unique-validator');
+const Player = require('./Player');
 const AreaSchema = new Schema({
   name: {
     type: String,
     required: [true, 'The name of area is required!'],
     unique: true
   },
+  ref_player: [Schema.Types.ObjectId],
   description: {
     type: String,
     default: ''

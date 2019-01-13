@@ -30,6 +30,11 @@ const PlayerSchema = new Schema({
     type: Boolean,
     default: false
   },
+  ref_area: {
+    type: mongoose.Types.ObjectId,
+    ref: 'Area',
+    required: [true, 'The area is reuquired!']
+  },
   confirmed_acount: {
     type: Boolean,
     default: false

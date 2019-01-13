@@ -1,3 +1,4 @@
+const bodyParser = require('body-parser');
 const express = require('express');
 const app = new express();
 // mongoose import
@@ -6,6 +7,11 @@ const mongoose = require('mongoose');
 require('./server/config/config');
 const routesApi = require('./routes/api');
 const routesWeb = require('./routes/web');
+// like to BodyParser
+// app.use(express.urlencoded({ extended: true })); esto no me funciono en una peticion POST mejor utilizo el BodyParser
+// Body parser -> Parsear a json formularios de entrada
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 //Enable CORS
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -15,8 +21,6 @@ app.use((req, res, next) => {
   );
   next();
 });
-// like to BodyParser
-app.use(express.urlencoded({ extended: true }));
 
 //Routes web
 app.use('/', routesWeb);

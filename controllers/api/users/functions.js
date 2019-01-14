@@ -27,12 +27,14 @@ const fnSendEmail = async (hashToValidateAcount, typePlayer, name, email) => {
     domain: domain
   });
   let message = undefined;
+  const urlEndPoint = _URL + '/activate_acount?target=' + hashToValidateAcount;
+  console.log('urlEndPoint', urlEndPoint);
   if (typePlayer == 'player') {
     message = `
     <p>Hola ${name} eres un participante, recuerda meter muchas cocas!</p>
     <b>Hash to validate: ${hashToValidateAcount}</b>
-    <p>
-    <a href="${_URL + '/activate_acount?target=' + hashToValidateAcount}"></a>
+    <p> click to activate </br>
+    <a href="${urlEndPoint}">Activar cuenta</a>
     </p>
     `;
   } else {

@@ -87,7 +87,7 @@ const fnSendEmail = async (hashToValidateAcount, typePlayer, name, email) => {
   </style>
   <div style="width: 100%;text-align: center;font-size: 17px;">
     <p>
-      Hola ${name} estás registrado como participante, recuerda meter muchas
+      Hola ${name} estás registrado como participante en Cocas Copiloto Satelital, recuerda meter muchas
       cocas y comparpirt muchos momentos felices!
     </p>
     <p style="display:inline-block;width:100%; text-align:center;">

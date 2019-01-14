@@ -30,9 +30,9 @@ app.use((req, res, next) => {
 app.use('/', routesWeb);
 // Routes api
 app.use('/api', routesApi);
-app.get('*', function(req, res) {
-  res.redirect('https://www.copiloto.com.mx/');
-});
+// app.get('*', function(req, res) {
+//   res.redirect('https://www.copiloto.com.mx/');
+// });
 // Connect to dataBase
 // mongodb://mongo_user:root123@ds255364.mlab.com:55364/cocascs
 // mongodb://mongo_user:root123@ds153978.mlab.com:53978/mongo_test

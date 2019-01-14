@@ -3,16 +3,15 @@ const muv = require('mongoose-unique-validator');
 const Schema = mongoose.Schema;
 
 const ConfirmationSchema = new Schema({
-  ref_participante: {
-    type: mongoose.Types.ObjectId,
-    ref: 'Player',
-    unique: true
-  },
   hash: { type: String, required: false },
   status: {
     type: Boolean,
     default: true,
     required: false
+  },
+  player: {
+    type: mongoose.Types.ObjectId,
+    ref: 'Player'
   },
   created_at: {
     type: Date,

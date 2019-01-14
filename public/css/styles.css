@@ -1,0 +1,16 @@
+body {
+  background: #142027;
+}
+.text {
+  color: #43cbbd;
+}
+.text-center {
+  text-align: center;
+}
+.custom-card {
+  width: 18rem;
+  background-color: #142027;
+  border: 1px solid #43cbbd;
+  margin: auto;
+  margin-top: 10%;
+}

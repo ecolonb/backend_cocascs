@@ -21,7 +21,7 @@ const fnSendEmail = async (hashToValidateAcount, typePlayer, name, email) => {
   //Enviar email confirmación.
   const api_key = '2fc79774891e9697ac90a271e20f9625-060550c6-a3572ca8';
   const domain = 'sandbox112ee495c6c040e8bb243e77b7138c90.mailgun.org';
-  const _URL = 'https://cocascs.herokuapp.com/api';
+  const _URL = 'https://cocascs.herokuapp.com';
   const mailgun = require('mailgun-js')({
     apiKey: api_key,
     domain: domain

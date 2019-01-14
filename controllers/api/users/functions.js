@@ -1,8 +1,23 @@
 const Player = require('../../../models/Player');
 const Session = require('../../../models/Session');
 const Area = require('../../../models/Area');
+const Confirmation = requires('../../../models/Confirmation');
 const bcrypt = require('bcrypt');
 const _ = require('underscore');
+
+// Funciones del modulo
+const fnSetConfirmationOerder = async id => {
+  const hashToValidate = await bcrypt.hashSync(id, 7);
+  const confirmationOrder = {
+    ref_player: id,
+    hash: hashToValidate
+  };
+  const confOrder = new Confirmation(confirmationOrder);
+  const saveOrder = await confOrder.save();
+  console.log('saveOrder: ', saveOrder);
+  return hashToValidate;
+};
+
 module.exports = {
   newUser: async (req, res) => {
     const formData = req.body;
@@ -82,6 +97,8 @@ module.exports = {
             const area = await Area.findById(formData.area);
             area.ref_player.push(NewPlayer);
             await area.save();
+            // Set confitmation data
+            const hashToValidateAcount = await this.fnSetConfirmationOerder;
             //Enviar email confirmación.
             var api_key = '2fc79774891e9697ac90a271e20f9625-060550c6-a3572ca8';
             var domain = 'sandbox112ee495c6c040e8bb243e77b7138c90.mailgun.org';
@@ -99,7 +116,7 @@ module.exports = {
                 formData.email +
                 '>',
               subject: 'Activación de cuenta Cocas Cs',
-              html: '<b> Test email validation HTML </b>'
+              html: '<b> HAsh to validate:' + hashToValidateAcount + '</b>'
             };
 
             mailgun.messages().send(data, function(error, body) {
@@ -113,6 +130,7 @@ module.exports = {
       }
     });
   },
+  // *************** Function to validate USER ****************
   checkUser: (req, res) => {
     //res.send('Checking username: ' + req.params.id);
     // user: new RegExp(req.params.id.trim(), 'i')
@@ -148,6 +166,7 @@ module.exports = {
       }
     });
   },
+  // *************** Function to validate EMAIL ****************
   checkEmail: (req, res) => {
     const emailToSearch = req.params.email.trim();
     console.log('Verificando si el email existe: ', emailToSearch);

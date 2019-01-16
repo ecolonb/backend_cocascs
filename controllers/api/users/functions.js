@@ -4,8 +4,10 @@ const Area = require('../../../models/Area');
 const Confirmation = require('../../../models/Confirmation');
 const bcrypt = require('bcrypt');
 const _ = require('underscore');
-
+const fetch = require('node-fetch');
+const _URL = 'https://cocascs.herokuapp.com';
 // Funciones del modulo
+
 const fnSetConfirmationOerder = async id => {
   const player = await Player.findById(id);
   const hashToValidate = await bcrypt.hashSync(String(id), 7);
@@ -17,26 +19,20 @@ const fnSetConfirmationOerder = async id => {
   await confirmation.save();
   return hashToValidate;
 };
-const fnSendEmail = async (hashToValidateAcount, typePlayer, name, email) => {
+const fnSendEmail = (hashToValidateAcount, typePlayer, name, email) => {
   //Enviar email confirmación.
-  const api_key = '2fc79774891e9697ac90a271e20f9625-060550c6-a3572ca8';
-  const domain = 'sandbox112ee495c6c040e8bb243e77b7138c90.mailgun.org';
-  const _URL = 'https://cocascs.herokuapp.com';
-  const mailgun = require('mailgun-js')({
-    apiKey: api_key,
-    domain: domain
-  });
-  let message = undefined;
-  const urlEndPoint = _URL + '/activate_acount?target=' + hashToValidateAcount;
-  console.log('urlEndPoint', urlEndPoint);
-  if (typePlayer == 'player') {
-    message = `
+  var message = undefined;
+  try {
+    const urlEndPoint =
+      _URL + '/activate_acount?target=' + hashToValidateAcount;
+    if (typePlayer == 'player') {
+      message = `
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
     <html xmlns="http://www.w3.org/1999/xhtml">
       <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <title>Demystifying Email Design</title>
+        <title>Email CocasCS</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <style>
           .myButton {
@@ -99,7 +95,7 @@ const fnSendEmail = async (hashToValidateAcount, typePlayer, name, email) => {
             <tr>
               <td>
                 <label
-                  style="display: block;width: 100%;  text-align: center;margin-bottom: 10px;margin-top: 20px;font-size: 18px;"
+                  style="display: block;width: 100%;  text-align: center;margin-bottom: 10px;margin-top: 20px;font-size: 18px;font-weight:400;"
                   >Bienvenido a Cocas Copiloto Satelital</label
                 >
               </td>
@@ -107,10 +103,10 @@ const fnSendEmail = async (hashToValidateAcount, typePlayer, name, email) => {
             <tr>
               <td>
                 <span
-                  style="display: block;width: 100%;  text-align: center;margin-bottom: 14px;font-size: 18px;"
+                  style="display: block;width: 100%;  text-align: center;margin-bottom: 14px;font-size: 15px;"
                 >
                   Hola ${name} estás registrado como participante, recuerda meter
-                  muchas cocas y comparpirt muchos momentos felices!!
+                  muchas cocas y compartir muchos momentos felices.
                 </span>
               </td>
             </tr>
@@ -126,33 +122,35 @@ const fnSendEmail = async (hashToValidateAcount, typePlayer, name, email) => {
       </body>
     </html>
     `;
-  } else {
-    message = `
+    } else {
+      message = `
     <p>Hola ${name} eres un espectador, ¡Tu no metes cocas!</p>
     '<b>Hash to validate: ${hashToValidateAcount}</b>
     `;
-  }
-
-  var data = {
-    from: 'Cocas Copiloto Satelital <ecolon@copiloto.com.mx>',
-    to: name + ' <' + email + '>',
-    subject: 'Activación de cuenta Cocas Cs',
-    html: message
-  };
-
-  const promiseEmail = new Promise(async (resolve, reject) => {
+    }
+  } catch (error_c) {}
+  const promiseEmail = new Promise((resolve, reject) => {
     try {
-      await mailgun.messages().send(data, function(error, body) {
-        if (error) {
-          console.log('error=>>>>>>>>>>>>>>>>: ', error);
-          resolve(false);
-        } else {
-          console.log('============>>>>>>> body: ', body);
+      const _URL = 'http://lab.micopiloto.com/dev5/cocascs/api/SendEmail';
+      let dataToSend = {
+        name: name,
+        email: email,
+        mssg: message,
+        token_auth: 'llaveWeb2786'
+      };
+      fetch(_URL, {
+        method: 'post',
+        body: JSON.stringify(dataToSend),
+        headers: { 'Content-Type': 'application/json' }
+      })
+        .then(res => {
+          //DoSomeThing
           resolve(true);
-        }
-      });
-    } catch (error) {
-      console.log('============>>>>>>> catch (error): ', error);
+        })
+        .catch(catchErr => {
+          resolve(false);
+        });
+    } catch (error__) {
       resolve(false);
     }
   });
@@ -245,16 +243,12 @@ module.exports = {
               NewPlayer.email
             )
               .then(resultEmail => {
-                console.log('resSendEmail==========>>>>>: ', resultEmail);
                 response_data.chk_email = resultEmail;
-                console.log('response_data========>>>>', response_data);
                 return res.status(200).json(response_data);
               })
               .catch(errPromise => {
                 response_data.chk_email = false;
-                console.log('response_data========>>>>', response_data);
                 return res.status(200).json(response_data);
-                console.log('errPromise: ', errPromise);
               });
 
             // //Enviar email confirmación.
@@ -327,7 +321,6 @@ module.exports = {
   // *************** Function to validate EMAIL ****************
   checkEmail: (req, res) => {
     const emailToSearch = req.params.email.trim();
-    console.log('Verificando si el email existe: ', emailToSearch);
     const searchParams = {
       email: emailToSearch
     };
